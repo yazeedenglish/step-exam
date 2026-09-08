@@ -1,940 +1,593 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STEP Practice Exam</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#F5F6F2;
-    --ink:#00273a;
-    --ink-soft:#5B645F;
-    --indigo:#00689b;   /* listening */
-    --teal:#00689b;     /* reading */
-    --amber:#00689b;    /* grammar */
-    --line:#DCDFD6;
-    --card:#FFFFFF;
-    --danger:#000000;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Tajawal',sans-serif;
-    line-height:1.55;
-    transition:background .2s ease, color .2s ease;
-  }
+    <meta charset="UTF-8">
 
-  /* ---------- Dark mode ---------- */
-  body.dark{
-    --paper:#15181C;
-    --ink:#E8EAE4;
-    --ink-soft:#9AA39B;
-    --card:#1E2227;
-    --line:#33383B;
-    --indigo:#00689b;
-    --teal:#00689b;
-    --amber:#00689b;
-    --danger:#E2897A;
-  }
-  body.dark .cta{background:#E8EAE4;color:#15181C;}
-  body.dark .cta:hover{background:#ffffff;}
-  body.dark .restart{color:var(--ink);border-color:var(--ink);}
-  body.dark .restart:hover{background:var(--ink);color:var(--paper);}
-  body.dark #topbar{background:rgba(21,24,28,0.94);}
-  body.dark .audio-fallback{background:#2E1E1B;border-color:#4A2E27;}
-  body.dark details.script .script-text{background:#181B1F;}
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  /* ---------- Theme toggle button ---------- */
-  #themeToggle{
-    position:fixed;top:14px;left:14px;z-index:20;
-    width:38px;height:38px;border-radius:35%;
-    background:var(--card);border:1px solid var(--line);color:var(--ink);
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.1rem;line-height:1;
-    box-shadow:0 1px 3px rgba(0, 0, 0, 0.08);
-  }
-  #themeToggle:hover{border-color:var(--ink-soft);}
-  h1,h2,h3{font-family:'Tajawal',sans-serif;font-weight:700;margin:0;}
+    <title>منصة يزيد للانجليزية | اختبار ستيب المحاكي</title>
 
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  .hidden{display:none !important;}
-  button{font-family:inherit;cursor:pointer;}
-  :focus-visible{outline:3px solid var(--indigo);outline-offset:2px;}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  /* ---------- Top bar / scantron progress ---------- */
-  #topbar{
-    position:sticky;top:0;z-index:10;
-    background:rgba(85, 198, 255, 0.027);
-    backdrop-filter:blur(6px);
-    border-bottom:1px solid var(--line);
-    padding:10px 20px;
-  }
-  .topbar-inner{max-width:760px;margin:0 auto;}
-  .topbar-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
-  .topbar-row .title{font-family:'Tajawal',serif;font-weight:700;font-size:1rem;}
-  .topbar-row .count{font-size:0.8rem;color:var(--ink-soft);}
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
+        rel="stylesheet"
+    >
 
-.timer-row{
-    display:flex;align-items:center;gap:8px;
-    margin-bottom:8px;padding:6px 10px;
-    background:var(--paper);border:1px solid var(--line);border-radius:2px;
-    width:fit-content;
-  }
-  .timer-label{font-family:'Tajawal',sans-serif;font-size:0.78rem;color:var(--ink-soft);}
-  .timer-value{
-    font-family:'IBM Plex Mono',monospace;direction:ltr;
-    font-size:1rem;font-weight:600;color:var(--ink);
-    transition:color .2s ease;
-  }
-  .timer-value.warning{
-    color:var(--danger);
-    animation:timerPulse 1s ease-in-out infinite;
-  }
-  @keyframes timerPulse{
-    0%,100%{opacity:1;}
-    50%{opacity:0.5;}
-  }
-
-  .scantron{display:flex;flex-direction:column;gap:3px;}
-  .scantron-row{display:grid;grid-template-columns:repeat(auto-fill,7px);gap:3px;}
-  .bubble{
-    width:7px;height:7px;border-radius:50%;
-    border:1px solid var(--line);
-    background:transparent;
-    transition:background .15s ease, border-color .15s ease;
-  }
-  .bubble.filled-listening{background:var(--indigo);border-color:var(--indigo);}
-  .bubble.filled-reading{background:var(--teal);border-color:var(--teal);}
-  .bubble.filled-grammar{background:var(--amber);border-color:var(--amber);}
-
-  /* ---------- Layout ---------- */
-  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 100px;}
-  .screen{}
-
-  /* Start screen */
-  .hero{padding:40px 0 20px;}
-  .hero .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.75rem;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--ink-soft);margin-bottom:14px;
-  }
-  .hero h1{font-size:2.4rem;line-height:1.1;}
-  .hero p{color:var(--ink-soft);margin-top:14px;font-size:1.02rem;max-width:56ch;}
-  .section-tiles{display:flex;gap:12px;margin:28px 0;flex-wrap:wrap;}
-  .tile{
-    flex:1;min-width:150px;
-    background:var(--card);border:1px solid var(--line);border-radius:2px;
-    padding:16px;border-top:4px solid var(--indigo);
-  }
-  .tile.reading{border-top-color:var(--teal);}
-  .tile.grammar{border-top-color:var(--amber);}
-  .tile .num{font-family:'Tajawal',monospace;font-size:1.6rem;font-weight:600;}
-  .tile .label{color:var(--ink-soft);font-size:0.85rem;margin-top:2px;}
-  .cta{
-    margin-top:20px;
-    background:var(--ink);color:var(--paper);
-    border:none;padding:14px 26px;font-size:1rem;font-weight:500;
-    border-radius:2px;
-  }
-  .cta:hover{background:#000;}
-
-  /* Section headers within exam */
-  .section-header{
-    display:flex;align-items:center;gap:12px;
-    margin:56px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--ink);
-  }
-  .section-header .swatch{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
-  .section-header.listening .swatch{background:var(--indigo);}
-  .section-header.reading .swatch{background:var(--teal);}
-  .section-header.grammar .swatch{background:var(--amber);}
-  .section-header h2{font-size:1.4rem;}
-  .section-header .sub{color:var(--ink-soft);font-size:0.85rem;margin-left:auto;font-family:'IBM Plex Mono',monospace;}
-
-  /* Clip / passage groups */
-  .group{
-    background:var(--card);border:1px solid var(--line);border-radius:3px;
-    padding:20px 22px;margin-bottom:22px;
-  }
-  .group-label{font-family:'Tajawal',monospace;font-size:0.75rem;color:var(--ink-soft);margin-bottom:10px;}
-  audio{width:100%;margin:6px 0 4px;}
-  .audio-fallback{
-    font-size:0.82rem;color:var(--danger);background:#FBEFEC;
-    border:1px solid #EAD1CB;padding:8px 10px;border-radius:2px;margin:8px 0;display:none;
-  }
-  details.script{margin-top:8px;font-size:0.9rem;}
-  details.script summary{cursor:pointer;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;}
-  details.script .script-text{margin-top:8px;padding:12px 14px;background:var(--paper);border-left:3px solid var(--indigo);white-space:pre-line;}
-  .passage-title{font-weight:600;margin-bottom:6px;}
-  .passage-text{margin-bottom:4px;}
-
-  /* Question */
-  .question{padding:16px 0;border-top:1px solid var(--line);}
-  .question:first-of-type{border-top:none;}
-  .qnum{font-family:'Tajawal',monospace;font-size:0.8rem;color:var(--ink-soft);margin-bottom:6px;}
-  .qtext{font-weight:500;margin-bottom:10px;}
-  .options{display:flex;flex-direction:column;gap:8px;}
-  .option{
-    display:flex;align-items:center;gap:10px;
-    padding:9px 12px;border:1px solid var(--line);border-radius:2px;
-    background:var(--paper);
-  }
-  .option:hover{border-color:var(--ink-soft);}
-  .option input{accent-color:var(--ink);width:16px;height:16px;flex-shrink:0;}
-  .option label{cursor:pointer;flex:1;font-size:0.95rem;}
-
-  /* Submit bar */
-  .submit-row{margin-top:48px;text-align:center;}
-  .submit-note{color:var(--ink-soft);font-size:0.85rem;margin-bottom:14px;}
-
-  /* Results */
-  .result-hero{text-align:center;padding:50px 0 20px;}
-  .result-hero .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
-  .score-big{font-family:'Tajawal',monospace;font-size:5rem;font-weight:600;line-height:1;margin:12px 0;}
-  .score-big span{font-size:2rem;color:var(--ink-soft);}
-  .breakdown{display:flex;gap:14px;margin:34px 0;flex-wrap:wrap;}
-  .breakdown .tile{border-top-width:4px;}
-  .breakdown .tile .num{font-size:1.4rem;}
-  .bar-track{height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden;}
-  .bar-fill{height:100%;}
-  .bar-fill.listening{background:var(--indigo);}
-  .bar-fill.reading{background:var(--teal);}
-  .bar-fill.grammar{background:var(--amber);}
-  .restart{
-    display:block;margin:30px auto 0;
-    background:transparent;border:1px solid var(--ink);color:var(--ink);
-    padding:12px 24px;border-radius:2px;font-size:0.95rem;
-  }
-  .restart:hover{background:var(--ink);color:var(--paper);}
-
-  @media (max-width:500px){
-    .hero h1{font-size:1.8rem;}
-    .score-big{font-size:3.6rem;}
-    .section-tiles{flex-direction:column;}
-  }
-  /* Professional exam interface */
-  :root{--paper:#f7f8fa;--ink:#14213d;--ink-soft:#65748b;--brand:#2563a6;--brand-dark:#1d4d82;--line:#e2e8f0;--card:#fff;--shadow:0 18px 50px rgba(16,42,67,.10)}
-  body{background:var(--paper)}.wrap{max-width:900px;padding:36px 24px 100px;text-align:center}.hero{max-width:760px;margin:auto;padding:38px 28px;border-radius:24px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}.hero p{margin:14px auto 0;text-align:center}.section-tiles{justify-content:center}.tile{border-radius:14px;box-shadow:0 7px 20px rgba(16,42,67,.05)}.cta{display:inline-flex;margin:20px auto 0;border-radius:12px;background:var(--brand);box-shadow:0 10px 20px rgba(37,99,166,.2)}.cta:hover{background:var(--brand-dark)}
-  .exam-workspace{max-width:780px;margin:auto;text-align:left;direction:ltr}.question-progress,.question-panel,.question-navigator{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(16,42,67,.05)}.question-progress{padding:16px 18px;margin-bottom:18px;direction:rtl;text-align:right}.progress-meta{display:flex;justify-content:space-between;font-weight:700}.progress-meta span:last-child{color:var(--ink-soft);font-weight:500}.progress-track{height:7px;margin-top:12px;background:#e7edf4;border-radius:99px;overflow:hidden}.progress-bar{height:100%;background:var(--brand);transition:width .25s}.question-panel{padding:28px}.section-tag,.qnum{direction:rtl;text-align:right;color:var(--brand);font-weight:700}.qtext{font-size:1.12rem;line-height:1.8}.option{border-radius:10px!important}.option label{direction:ltr;text-align:left}.audio-policy{display:block;direction:rtl;text-align:right;padding:10px 12px;margin-bottom:14px;border-radius:10px;background:#f2f6fa;color:var(--ink-soft);font-size:.85rem}.listening-question{padding:18px 0;border-top:1px solid var(--line)}.listening-question:first-of-type{border-top:0}.exam-navigation{display:flex;justify-content:center;gap:12px;margin-top:20px}.nav-btn{min-width:138px;padding:11px 18px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:700 1rem inherit;cursor:pointer}.nav-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.question-navigator{display:grid;grid-template-columns:repeat(10,1fr);gap:7px;margin-top:18px;padding:14px}.question-jump{height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;font:700 .76rem inherit;cursor:pointer}.question-jump.answered{background:#e7f0fa;border-color:#9bbadb;color:var(--brand)}.question-jump.current{outline:2px solid var(--brand)}.question-jump.unanswered{border-color:#e0a24d;color:#a15f08}.submit-row{display:none}.result-hero{padding:42px;border-radius:24px;background:var(--card);box-shadow:var(--shadow)}
-  body.dark{--paper:#101827;--ink:#edf4fc;--ink-soft:#adc0d5;--card:#182437;--line:#2c4059;--brand:#67a9ee;--brand-dark:#8bc0f7}body.dark #topbar{background:rgba(16,24,39,.94)}body.dark .option{background:#132035;border-color:#344a64}body.dark .question-panel .option:has(input:checked){background:#1b3656;border-color:#67a9ee}body.dark .question-jump,body.dark .nav-btn{background:#182437;color:var(--ink)}body.dark .progress-track{background:#2a3c53}
-  .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}.brand-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--brand);color:#fff;font-size:1.45rem;font-weight:900;box-shadow:0 10px 22px rgba(37,99,166,.22)}.brand-name{text-align:right;font-weight:800;line-height:1.15}.brand-name small{display:block;margin-top:4px;color:var(--ink-soft);font-size:.68rem;letter-spacing:.12em}.hero .eyebrow{display:inline-block;padding:7px 15px;border-radius:99px;background:#edf3f8;color:var(--brand);font-family:'Tajawal',sans-serif;font-size:.87rem;font-weight:800;line-height:1.35;letter-spacing:0}.navigator-note{margin:12px 0 0;color:var(--ink-soft);font-size:.84rem;text-align:center;direction:rtl}.celebration{font-size:2.8rem;margin-bottom:8px}.result-badge{display:inline-block;padding:7px 14px;border-radius:99px;background:#edf3f8;color:var(--brand);font-weight:800}.course-link{display:inline-flex;margin:15px auto 0;padding:12px 20px;border:1px solid var(--brand);border-radius:11px;color:var(--brand);font-weight:800;text-decoration:none}.course-link:hover{background:var(--brand);color:#fff}.course-hint{color:var(--ink-soft);margin:14px auto 0}
-  .confirm-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(12,27,46,.52);backdrop-filter:blur(4px)}.confirm-modal[hidden]{display:none}.confirm-card{width:min(100%,440px);padding:30px;border-radius:20px;background:var(--card);color:var(--ink);text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.25)}.confirm-icon{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:#edf3f8;color:var(--brand);font-size:1.5rem}.confirm-card h3{margin:0;font-size:1.28rem}.confirm-card p{margin:10px 0 22px;color:var(--ink-soft);line-height:1.8}.confirm-actions{display:flex;justify-content:center;gap:10px}.confirm-actions .cta{margin:0}.confirm-actions .nav-btn{min-width:0}
-  .single-listening{display:none}.audio-controls{display:flex;align-items:center;gap:14px;margin:0 0 14px;direction:rtl}.play-audio-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 19px;border:0;border-radius:10px;background:var(--brand);color:#fff;font:700 .95rem 'Tajawal',sans-serif;cursor:pointer;box-shadow:0 7px 16px rgba(37,99,166,.2)}.play-audio-btn:hover{background:var(--brand-dark)}.play-audio-btn:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}.volume-control{display:flex;align-items:center;gap:8px;color:var(--ink-soft);font:700 .84rem 'Tajawal',sans-serif}.volume-control input{width:110px;accent-color:var(--brand);cursor:pointer}.volume-value{min-width:34px;direction:ltr;font-variant-numeric:tabular-nums}@media(max-width:500px){.audio-controls{align-items:flex-start;flex-direction:column;gap:10px}}
-</style>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<button id="themeToggle" aria-label="Toggle night mode" title="Toggle night mode">🌙</button>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-<div id="topbar" class="hidden">
-  <div class="topbar-inner">
-    <div class="topbar-row">
-      <span class="title">اختبار محاكي ستيب</span>
-      <span class="count mono" id="answeredCount">0 / 100 answered</span>
-    </div>
-    <div class="timer-row">
-      <span class="timer-label">الوقت المتبقي</span>
-      <span class="timer-value" id="timerValue">2:00:00</span>
-    </div>
-    <div class="scantron" id="scantron"></div>
-  </div>
-</div>
+    <header class="top-header">
 
-<div class="wrap">
+        <div class="brand">
 
-  <!-- START SCREEN -->
-  <div class="screen" id="startScreen">
-    <div class="hero">
-      <div class="brand" aria-label="YAZEED ENGLISH"><div class="brand-mark">Y</div><div class="brand-name">منصة يزيد للانجليزية<small>YAZEED ENGLISH</small></div></div>
-      <div class="eyebrow">اختبار تجريبي متكامل</div>
-      <h1>اختبار محاكي ستيب</h1>
-      <p>السلام عليكم ورحمة الل ه وب تجربة ستيب تجربة ستيب تجربة ستيب تجربة سيب.</p>
-    </div>
-    <div class="section-tiles">
-      <div class="tile listening">
-        <div class="num">20</div>
-        <div class="label">سؤال استماع</div>
-      </div>
-      <div class="tile reading">
-        <div class="num">40</div>
-        <div class="label">سؤال قراءة</div>
-      </div>
-      <div class="tile grammar">
-        <div class="num">40</div>
-        <div class="label">سؤال قواعد</div>
-      </div>
-    </div>
-    <p style="color:var(--ink-soft);font-size:0.9rem;">اضف ملاحظات هنااضف ملاحظات هنا اضف ملاحظات هنا اضف ملاحظات هنا</p>
-    <button class="cta" id="beginBtn">ابدأ الاختبار</button>
-  </div>
+            <img
+                src="logo.png"
+                alt="Yazeed English"
+                class="brand-logo"
+                onerror="this.style.display='none';"
+            >
 
-  <!-- EXAM SCREEN -->
-  <div class="screen hidden" id="examScreen">
-    <div id="examContent"></div>
-    <div class="submit-row">
-      <div class="submit-note" id="submitNote">قم بالاجابة على الـ100 سؤال لرؤية نتيجتك</div>
-      <button class="cta" id="submitBtn">إرسال</button>
-    </div>
-  </div>
+            <div class="brand-text">
+                <strong>Yazeed English</strong>
+                <span>منصة يزيد للانجليزية</span>
+            </div>
 
-  <!-- RESULTS SCREEN -->
-  <div class="screen hidden" id="resultsScreen">
-    <div class="result-hero">
-      <div class="eyebrow">نتيجتك</div>
-      <div class="score-big"><span id="scoreValue">0</span><span>/100</span></div>
-      <div id="scoreMsg" style="color:var(--ink-soft);"></div>
-    </div>
-    <div class="breakdown">
-      <div class="tile listening">
-        <div class="num" id="listeningScore">0/20</div>
-        <div class="label">الاستماع</div>
-        <div class="bar-track"><div class="bar-fill listening" id="listeningBar" style="width:0%"></div></div>
-      </div>
-      <div class="tile reading">
-        <div class="num" id="readingScore">0/40</div>
-        <div class="label">القراءة</div>
-        <div class="bar-track"><div class="bar-fill reading" id="readingBar" style="width:0%"></div></div>
-      </div>
-      <div class="tile grammar">
-        <div class="num" id="grammarScore">0/40</div>
-        <div class="label">القواعد</div>
-        <div class="bar-track"><div class="bar-fill grammar" id="grammarBar" style="width:0%"></div></div>
-      </div>
-    </div>
-    <button class="restart" id="restartBtn">إعادة الاختبار</button>
-  </div>
+        </div>
 
-</div>
+       <div class="header-actions">
 
-<div class="confirm-modal" id="confirmModal" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="confirm-card">
-    <div class="confirm-icon">✓</div>
-    <h3 id="confirmTitle">هل تريد تسليم الاختبار؟</h3>
-    <p id="confirmMessage"></p>
-    <div class="confirm-actions">
-      <button class="nav-btn" id="cancelConfirmBtn">العودة للاختبار</button>
-      <button class="cta" id="approveConfirmBtn">تأكيد التسليم</button>
-    </div>
-  </div>
-</div>
+    <button
+        id="themeBtn"
+        class="theme-btn"
+        type="button"
+        aria-label="تغيير المظهر"
+    >
+        🌙
+    </button>
 
-<script>
-/* ============================================================
-   DATA
-   Each listening clip / reading passage groups its questions.
-   Grammar questions are standalone.
-   answer = index (0-based) of the correct option.
-   To use real audio later, just change the "audio" path for
-   each clip to your own file (e.g. "audio/listening_1.mp3").
-============================================================ */
-
-const listeningClips = [
-  { audio:"listening_1.mp3",
-    script:"Man: Hi, I need help switching out of my 9 a.m. Chemistry section — it clashes with my work schedule.\nWoman: Sure, let me check what's open. There's a 2 p.m. section with Dr. Alavi that still has seats.\nMan: That could work. Is the lab time the same?\nWoman: Yes, the lab stays on Thursday afternoons either way. I'll process the switch now — just sign this form.",
-    questions:[
-      {text:"What is the man's problem?", options:["His course was cancelled","His class time conflicts with work","He failed the course","He wants a refund"], answer:0},
-      {text:"What does the woman offer?", options:["A refund","A different lab day","A 2 p.m. section with Dr. Alavi","A private tutor"], answer:0}
-    ]},
-  { audio:"audio/listening_2.mp3",
-    script:"Woman: Excuse me, will the library stay open later during finals week?\nMan: Yes, starting Monday we extend hours until 2 a.m., seven days a week.\nWoman: Great. Is the group study room still bookable online?\nMan: It is, but during finals week bookings are limited to two hours per group.",
-    questions:[
-      {text:"Why does the woman speak to the man?", options:["To return a book","To ask about extended library hours","To complain about noise","To pay a late fee"], answer:0},
-      {text:"What limit applies to the group study room during finals?", options:["It closes early","Bookings are limited to two hours","It's closed all week","Only staff can book it"], answer:0}
-    ]},
-  { audio:"audio/listening_3.mp3",
-    script:"Woman: I'm calling to reschedule my appointment with Dr. Nasser on Tuesday.\nMan: No problem. Would Thursday at 10 a.m. work instead?\nWoman: I have a class then — could we do Thursday afternoon?\nMan: I can offer 3:30 p.m. on Thursday. I'll update your file.",
-    questions:[
-      {text:"Why is the woman calling?", options:["To cancel her appointment","To reschedule her appointment","To ask about medication","To request a doctor's note"], answer:0},
-      {text:"What time is the woman's new appointment?", options:["10 a.m. Thursday","Tuesday afternoon","3:30 p.m. Thursday","3:30 p.m. Tuesday"], answer:2}
-    ]},
-  { audio:"audio/listening_4.mp3",
-    script:"Man: Did you see the forecast for Saturday? They're predicting heavy rain.\nWoman: Really? We were planning to hike the northern trail.\nMan: We could move it to Sunday — it's supposed to clear up by then.\nWoman: Good idea. I'll message the others about the change.",
-    questions:[
-      {text:"What are the speakers mainly discussing?", options:["A trip they need to postpone because of rain","A job interview","A hiking injury","A weather app malfunction"], answer:0},
-      {text:"What does the woman decide to do?", options:["Cancel the trip entirely","Message others about moving the trip to Sunday","Go hiking alone","Wait until next month"], answer:1}
-    ]},
-  { audio:"audio/listening_5.mp3",
-    script:"Woman: Excuse me, could you tell me how to get to the new Engineering building?\nMan: Sure, go straight past the library, then turn left at the fountain.\nWoman: Is it the tall glass building?\nMan: That's the one — the main entrance faces the parking lot.",
-    questions:[
-      {text:"What does the woman want to know?", options:["Where the library is","How to reach the Engineering building","Where to park","When the building opens"], answer:1},
-      {text:"How does the woman recognize the building?", options:["By its red roof","By its tall glass structure","By a sign near the fountain","By its clock tower"], answer:1}
-    ]},
-  { audio:"audio/listening_6.mp3",
-    script:"Man: Hi, I'm calling to follow up on my interview last week for the marketing position.\nWoman: Thank you for calling. We're still reviewing candidates and will decide by Friday.\nMan: Understood. Should I send any additional documents?\nWoman: A copy of your certification would be helpful — please email it today.",
-    questions:[
-      {text:"Why does the man call?", options:["To schedule an interview","To follow up on his job application","To resign from his job","To ask for a raise"], answer:1},
-      {text:"What does the woman ask him to send?", options:["A reference letter","His resume again","A copy of his certification","A photo ID"], answer:2}
-    ]},
-  { audio:"audio/listening_7.mp3",
-    script:"Woman: I'd like the grilled chicken, but could you leave out the dairy sauce? I have an allergy.\nMan: Of course — I'll ask the kitchen to prepare it with olive oil instead.\nWoman: Thank you. Could I also get a side salad instead of fries?\nMan: Absolutely, that's no problem at all.",
-    questions:[
-      {text:"What does the woman ask the waiter to change?", options:["The type of meat","The sauce, due to an allergy","The seating","The drink"], answer:1},
-      {text:"What does she request instead of fries?", options:["Rice","Bread","A side salad","Soup"], answer:2}
-    ]},
-  { audio:"audio/listening_8.mp3",
-    script:"Man: My printer stopped working after only two weeks — can I get it replaced?\nWoman: Do you have the receipt? If it's within 30 days, we can exchange it for free.\nMan: Yes, here it is, dated the 5th of this month.\nWoman: That qualifies. I'll get you a new one from the back.",
-    questions:[
-      {text:"What is the man's problem?", options:["He lost his receipt","His printer broke shortly after purchase","He wants a refund on ink","His printer is too expensive"], answer:1},
-      {text:"What allows the man to get a free exchange?", options:["A membership card","The receipt showing purchase within 30 days","A warranty he purchased separately","A manager's approval"], answer:1}
-    ]},
-  { audio:"audio/listening_9.mp3",
-    script:"Woman: Could we talk about the music at night? I have early classes and it's hard to sleep.\nMan: Sorry, I didn't realize it was that loud. I'll use headphones after 10 p.m.\nWoman: That would really help, thank you.\nMan: No problem — let me know if it happens again.",
-    questions:[
-      {text:"What is the woman's complaint?", options:["The room is too cold","Loud music at night disturbs her sleep","Her roommate uses her things","The room is messy"], answer:1},
-      {text:"What solution does the man offer?", options:["Moving to another room","Turning off the music completely","Using headphones after 10 p.m.","Sleeping somewhere else"], answer:2}
-    ]},
-  { audio:"audio/listening_10.mp3",
-    script:"Man: I need to change my flight to Riyadh because of a family emergency.\nWoman: I understand. There's a flight leaving tonight at 9 p.m. with one seat left.\nMan: I'll take it. Is there a fee for the change?\nWoman: Since it's an emergency, we'll waive the change fee this time.",
-    questions:[
-      {text:"Why does the man want to change his flight?", options:["He missed his original flight","A family emergency","He wants a cheaper ticket","His flight was cancelled"], answer:1},
-      {text:"What does the airline agent do about the fee?", options:["Charges double","Waives the change fee","Refunds the whole ticket","Requires payment later"], answer:1}
-    ]}
-];
-
-const readingPassages = [
-  { title:"Firefighter Mike",
-    text:"(1)    Over the roar of the fire, Mike heard Ben shout, Hurry! The fire is almost on us! Mike's arms were sore and tired, but he swung his axe even faster. He didn't even stop to wipe the tears from his stinging eyes. The greedy fire kept coming. The more the fire destroyed, the more it wanted. Mike worked shoulder to shoulder with the other smokejumpers to build a firebreak. His only thought was to stop the flaming monster that was raging through the forest.       (2)         At last, the smoke jumpers finished the firebreak. If the fire were powerful enough, it would jump over the firebreak that they had worked so hard to make. Then they would have to start all over again. Mike stood motionless, his face black with ash, his shirt wet with sweat. He was too exhausted to move because he had given all of himself to fighting the fire. He turned his head and noticed Ben watching him.    (3)    Suddenly all that Ben had taught Mike about proving his bravery was clear. A man was not brave if he did something just to prove his courage. He was brave only when he forgot about himself. Today Mike had showed that he cared very much about the others with whom he was working.",
-    questions:[
-      {text:"What is the passage mainly about?", options:["History of oil in Saudi Arabia","Saudi Arabia's shift toward renewable energy","Wind farm construction techniques","Global oil prices"], answer:1},
-      {text:"According to the passage, where are solar projects built?", options:["Along the coast","In the desert regions","In major cities","Near rivers"], answer:1},
-      {text:"The word \"diversify\" is closest in meaning to:", options:["reduce","vary or expand","eliminate","simplify"], answer:1},
-      {text:"It can be inferred from the passage that:", options:["Oil will disappear immediately","The shift to renewables faces some challenges","Wind energy has failed","No jobs will be created"], answer:1},
-      {text:"What concern do critics raise?", options:["Solar panels don't work in deserts","The transition needs a lot of funding and time","Wind farms are illegal","Officials have no plans"], answer:1}
-    ]},
-  { title:"The Value of Reading",
-    text:"Regular reading offers benefits that extend beyond simple enjoyment. Studies suggest that people who read frequently tend to have stronger vocabularies and better concentration than those who rarely read. Reading fiction, in particular, has been linked to increased empathy, as it allows readers to imagine the perspectives and emotions of different characters. Nonfiction reading, meanwhile, builds background knowledge that can help with critical thinking in unrelated subjects. Educators often encourage students to read a variety of materials rather than focusing on a single genre. Despite these advantages, many people report reading less than they did a decade ago, citing the distractions of smartphones and social media as significant factors.",
-    questions:[
-      {text:"What is the main idea of the passage?", options:["Fiction is more useful than nonfiction","Reading offers benefits beyond enjoyment","Vocabulary tests are important","Students dislike reading"], answer:1},
-      {text:"What has fiction reading been linked to?", options:["Better memory only","Increased empathy","Faster reading speed","Lower concentration"], answer:1},
-      {text:"The word \"citing\" is closest in meaning to:", options:["ignoring","mentioning as a reason","criticizing","measuring"], answer:1},
-      {text:"What can be inferred from the passage?", options:["Reading one genre is best","A variety of reading materials is more beneficial","Nonfiction has no value","Reading habits haven't changed"], answer:1},
-      {text:"What factor is linked to reduced reading?", options:["Longer books","Smartphones and social media","Better vocabulary","More libraries"], answer:1}
-    ]},
-  { title:"The Spice Trade",
-    text:"For centuries, the spice trade connected distant regions of the world, linking merchants in Arabia, India, and Europe. Spices such as pepper, cinnamon, and cloves were highly valued, not only for flavoring food but also for preserving it and for use in medicine. Arab traders played a central role, controlling many of the routes that carried goods from Asia to the Mediterranean. Because the exact origins of these spices were often kept secret, European buyers paid high prices without knowing precisely where the goods came from. This lack of knowledge eventually motivated European explorers to search for direct sea routes to Asia, a search that reshaped global trade and led to new discoveries.",
-    questions:[
-      {text:"What is the passage mainly about?", options:["Modern shipping routes","The role of Arab traders in the historic spice trade","European cooking methods","The invention of preservatives"], answer:1},
-      {text:"According to the passage, spices were valued for:", options:["Flavoring, preserving, and medicine","Only their smell","Building materials","Currency exchange"], answer:0},
-      {text:"The word \"reshaped\" is closest in meaning to:", options:["destroyed","changed significantly","copied","ignored"], answer:1},
-      {text:"What can be inferred about the secrecy of spice origins?", options:["It lowered prices","It motivated European exploration","It stopped all trade","It had no effect"], answer:1},
-      {text:"Who controlled many of the spice trade routes?", options:["European explorers","Arab traders","Indian farmers","Mediterranean sailors"], answer:1}
-    ]},
-  { title:"Sleep and Productivity",
-    text:"Getting enough sleep is often overlooked as a factor in daily performance. Research shows that adults who sleep fewer than six hours a night tend to make more errors at work and have slower reaction times than those who sleep seven to nine hours. Poor sleep has also been associated with a weakened immune system, making people more susceptible to illness. Some companies have begun to recognize this connection, offering flexible schedules or nap rooms to help employees rest. Sleep experts recommend maintaining a consistent bedtime, avoiding screens before sleep, and limiting caffeine in the afternoon. While lifestyle habits play a large role, workplace culture that values rest, rather than constant availability, may also be necessary for meaningful change.",
-    questions:[
-      {text:"What is the main idea of the passage?", options:["Sleep has no effect on work","Sleep plays an important role in performance","Companies should ban naps","Caffeine improves focus"], answer:1},
-      {text:"What happens to people who sleep less than six hours?", options:["They make more errors and react more slowly","They become more creative","They need less food","They sleep better later"], answer:0},
-      {text:"The word \"susceptible\" is closest in meaning to:", options:["immune","likely to be affected by","unaware of","tired of"], answer:1},
-      {text:"What can be inferred from the passage?", options:["Workplace culture may need to change too","Sleep only affects students","Nap rooms are required by law","Caffeine has no effect on sleep"], answer:0},
-      {text:"What do sleep experts recommend?", options:["Sleeping during the day only","A consistent bedtime and less screen time","Skipping breakfast","Working night shifts"], answer:1}
-    ]},
-  { title:"Small Business Challenges",
-    text:"Starting a small business involves more than simply having a good idea. Entrepreneurs must secure funding, which can come from personal savings, bank loans, or investors, each with different risks and requirements. Once a business is running, managing cash flow becomes a constant challenge, since expenses often arise before revenue is collected. Marketing is another hurdle, particularly for businesses competing with larger, established companies that have bigger advertising budgets. Many new business owners find that building a loyal customer base takes longer than expected, requiring patience and consistent effort. Despite these difficulties, government programs in several countries now offer grants and mentorship to help small businesses survive their critical first few years.",
-    questions:[
-      {text:"What is the passage mainly about?", options:["How to advertise a business","Challenges of starting a small business","Bank loan interest rates","Government tax policy"], answer:1},
-      {text:"What is a common cash flow challenge?", options:["Expenses often arise before revenue is collected","Investors demand too much profit","Banks refuse all loans","Employees are paid too much"], answer:0},
-      {text:"The word \"hurdle\" is closest in meaning to:", options:["advantage","obstacle","budget","reward"], answer:1},
-      {text:"What can be inferred about building a customer base?", options:["It happens overnight","It requires patience and time","It is unnecessary","It only matters for large companies"], answer:1},
-      {text:"What kind of help do governments offer?", options:["Free advertising only","Grants and mentorship","Guaranteed profits","Free office space only"], answer:1}
-    ]},
-  { title:"Saudi Hospitality",
-    text:"Hospitality holds a central place in Saudi culture, shaped by centuries of tradition rooted in the desert environment. Guests are traditionally welcomed with Arabic coffee and dates, a custom that signals warmth and respect regardless of how well the host knows the visitor. In the past, travelers crossing the desert relied on this hospitality for survival, and hosts were expected to provide food and shelter without expecting anything in return. Today, this tradition continues in modified forms, appearing in everything from family gatherings to formal business meetings. Many visitors to the region note that this emphasis on generosity leaves a lasting impression, often becoming one of their most memorable experiences of Saudi culture.",
-    questions:[
-      {text:"What is the main idea of the passage?", options:["Desert survival techniques","The tradition of hospitality in Saudi culture","Coffee farming methods","Business meeting etiquette only"], answer:1},
-      {text:"How are guests traditionally welcomed?", options:["With tea and bread","With Arabic coffee and dates","With formal written invitations","With a tour of the house"], answer:1},
-      {text:"The word \"rooted\" is closest in meaning to:", options:["based on and originating from","disconnected from","opposed to","hidden from"], answer:0},
-      {text:"What can be inferred about the origin of this hospitality?", options:["It was originally connected to survival in the desert","It began in modern cities","It was invented for tourism","It has no historical basis"], answer:0},
-      {text:"Where does this tradition appear today?", options:["Only in museums","In family gatherings and business meetings","Only in restaurants","Only during holidays"], answer:1}
-    ]},
-  { title:"Artificial Intelligence in Daily Life",
-    text:"Artificial intelligence has moved from research laboratories into everyday devices, often without users realizing it. Smartphone applications use it to suggest routes, correct typing errors, and recommend videos based on past viewing habits. In healthcare, algorithms help doctors detect patterns in medical images that might be missed by the human eye, though final decisions typically remain with trained professionals. Some educators now use adaptive software that adjusts the difficulty of exercises based on a student's performance. As these tools become more common, questions have emerged about data privacy and the extent to which people should rely on automated recommendations rather than their own judgment. Experts generally agree that AI works best as a support tool rather than a full replacement for human decision-making.",
-    questions:[
-      {text:"What is the passage mainly about?", options:["The history of computers","AI's growing role in everyday life","Medical training programs","Smartphone manufacturing"], answer:1},
-      {text:"How is AI used in healthcare, according to the passage?", options:["It replaces doctors completely","It helps detect patterns in medical images","It sets hospital prices","It schedules appointments only"], answer:1},
-      {text:"The word \"adaptive\" is closest in meaning to:", options:["fixed and unchanging","able to adjust or change","expensive","outdated"], answer:1},
-      {text:"What do experts generally agree on?", options:["AI should fully replace human judgment","AI works best as a support tool","AI is too unreliable to use","AI should be banned in schools"], answer:1},
-      {text:"What concern is mentioned about AI tools?", options:["They are too slow","Data privacy","They are too cheap","They require no electricity"], answer:1}
-    ]},
-  { title:"Plastic Waste",
-    text:"Plastic waste has become one of the most visible environmental challenges of recent decades. Much of the plastic produced each year is used only once before being discarded, and a large portion ends up in landfills or oceans rather than being recycled. Marine animals frequently mistake plastic fragments for food, which can cause injury or death. In response, several countries have introduced bans or fees on single-use plastic bags and straws, encouraging consumers to switch to reusable alternatives. Companies have also begun experimenting with biodegradable packaging made from plant materials, though these alternatives are often more expensive to produce. Environmental groups argue that reducing plastic production, rather than only improving recycling, is necessary to address the scale of the problem.",
-    questions:[
-      {text:"What is the main idea of the passage?", options:["Plastic recycling is perfect already","The challenge of plastic waste and responses to it","Ocean animals prefer plastic","Plastic bags are illegal everywhere"], answer:1},
-      {text:"What effect does plastic have on marine animals?", options:["They mistake it for food, causing injury or death","They use it for shelter safely","It has no effect on them","They avoid it completely"], answer:0},
-      {text:"The word \"biodegradable\" is closest in meaning to:", options:["indestructible","able to decompose naturally","extremely cheap","waterproof"], answer:1},
-      {text:"What can be inferred from the passage?", options:["Recycling alone may not be enough to solve the problem","Plastic production has already stopped","Bans have had no effect","Biodegradable materials are always cheaper"], answer:0},
-      {text:"What do environmental groups argue for?", options:["More single-use plastic","Reducing plastic production","Ending all recycling programs","Higher plastic imports"], answer:1}
-    ]}
-];
-
-const grammarQuestions = [
-  {text:"By the time we arrived, the meeting ___ already started.", options:["has","had","have","was"], answer:0},
-  {text:"Neither of the students ___ finished the assignment.", options:["have","has","having","had"], answer:1},
-  {text:"She is interested ___ learning new languages.", options:["on","in","at","for"], answer:1},
-  {text:"If I ___ more time, I would travel abroad every year.", options:["have","had","will have","having"], answer:1},
-  {text:"The report, ___ was submitted late, contained several errors.", options:["which","who","whom","what"], answer:0},
-  {text:"He suggested ___ the meeting until next week.", options:["to postpone","postponing","postpone","postponed"], answer:1},
-  {text:"This restaurant is ___ than the one we visited last week.", options:["more good","better","best","more better"], answer:1},
-  {text:"The bridge ___ by the city council in 1990.", options:["built","was built","has built","building"], answer:1},
-  {text:"You ___ finish the report before the deadline, or you'll lose the client.", options:["must","might","would","could"], answer:0},
-  {text:"There ___ many reasons why the project failed.", options:["is","are","was","has been"], answer:1},
-  {text:"She has lived in Riyadh ___ 2015.", options:["for","since","during","from"], answer:1},
-  {text:"The teacher asked the students ___ quiet during the test.", options:["to be","being","be","been"], answer:0},
-  {text:"___ of the applicants had the required experience.", options:["Few","A little","Much","Amount"], answer:0},
-  {text:"I look forward ___ from you soon.", options:["to hear","to hearing","hear","hearing"], answer:1},
-  {text:"The company announced ___ new policy last month.", options:["a","an","the","(no article)"], answer:0},
-  {text:"Had she studied harder, she ___ passed the exam.", options:["would have","will have","had","would"], answer:0},
-  {text:"This is the same book ___ I read last year.", options:["that","what","whom","whose"], answer:0},
-  {text:"The number of unemployed workers ___ risen sharply.", options:["have","has","having","had risen"], answer:1},
-  {text:"He denied ___ the money.", options:["to steal","stealing","steal","stolen"], answer:1},
-  {text:"Despite ___ hard, he failed the exam.", options:["study","studying","studied","to study"], answer:1},
-  {text:"The manager, along with his assistants, ___ attending the conference.", options:["are","is","were","be"], answer:1},
-  {text:"It is essential that every employee ___ the safety rules.", options:["follow","follows","followed","following"], answer:0},
-  {text:"She would rather ___ at home than go out tonight.", options:["stay","stays","to stay","staying"], answer:0},
-  {text:"The results were ___ surprising that the researchers repeated the experiment.", options:["so","such","too","very"], answer:0},
-  {text:"Not only ___ the report finished, but it was also well written.", options:["was","is","did","has"], answer:0},
-  {text:"The children were excited ___ the amusement park.", options:["about visit","about visiting","to visiting","for visit"], answer:1},
-  {text:"___ you study, the better your results will be.", options:["The more","More","The most","As more"], answer:0},
-  {text:"This is the hotel ___ we stayed last summer.", options:["which","where","what","who"], answer:1},
-  {text:"He acted as though he ___ never heard the news.", options:["has","had","have","having"], answer:1},
-  {text:"The professor, as well as his students, ___ pleased with the outcome.", options:["are","is","were","be"], answer:1},
-  {text:"I wish I ___ how to swim when I was younger.", options:["know","knew","had learned","will know"], answer:2},
-  {text:"The more you practice speaking English, ___ you will become.", options:["fluent","the more fluent","more fluent","fluently"], answer:1},
-  {text:"She is one of the students who ___ always on time.", options:["is","are","was","being"], answer:1},
-  {text:"Scarcely had he arrived ___ the phone rang.", options:["than","when","then","as"], answer:1},
-  {text:"The committee is expected ___ its decision by Friday.", options:["announce","to announce","announcing","announced"], answer:1},
-  {text:"He is used to ___ up early for work.", options:["get","getting","got","to get"], answer:1},
-  {text:"The novel, of which the author ___ unknown, became a bestseller.", options:["was","is","were","be"], answer:1},
-  {text:"No sooner had the show started ___ the lights went out.", options:["than","when","then","that"], answer:0},
-  {text:"It's high time we ___ a decision about the merger.", options:["make","made","making","to make"], answer:1},
-  {text:"Were I in your position, I ___ accept the offer immediately.", options:["will","would","shall","can"], answer:1}
-];
-
-/* ============================================================
-   BUILD FLAT QUESTION LIST (for numbering + scoring)
-============================================================ */
-/* Five listening clips — each one contains four questions on the same page.
-   Replace audio/listening_1.mp3 through audio/listening_5.mp3 with recordings
-   that match the four questions in each group. */
-const listeningGroups = Array.from({length:5}, (_, groupIndex) => {
-  const first = listeningClips[groupIndex * 2];
-  const second = listeningClips[groupIndex * 2 + 1];
-  return {
-    audio: `audio/listening_${groupIndex + 1}.mp3`,
-    script: `${first.script}\n\n${second.script}`,
-    questions: [...first.questions, ...second.questions]
-  };
-});
-
-const allQuestions = [];
-let qid = 0;
-listeningGroups.forEach((clip, ci) => {
-  clip.questions.forEach(q => { qid++; allQuestions.push({id:qid, section:'listening', clipIndex:ci, ...q}); });
-});
-readingPassages.forEach((p, pi) => {
-  p.questions.forEach(q => { qid++; allQuestions.push({id:qid, section:'reading', passageIndex:pi, ...q}); });
-});
-grammarQuestions.forEach(q => { qid++; allQuestions.push({id:qid, section:'grammar', ...q}); });
-
-const userAnswers = {}; // id -> selected option index
-
-let timeExpired = false;
-
-/* ============================================================
-   RENDER EXAM
-============================================================ */
-function renderExam(){
-  const container = document.getElementById('examContent');
-  let html = '';
-
-  html += sectionHeader('listening', 'Part 1 · Listening', '20 questions');
-  listeningClips.forEach((clip, ci) => {
-    html += `<div class="group">
-      <div class="group-label">CLIP ${ci+1} OF 10</div>
-      <audio controls src="${clip.audio}" onerror="this.nextElementSibling.style.display='block'"></audio>
-      <div class="audio-fallback">Audio file not found yet — add your recording at <code>${clip.audio}</code>. Use the script below as a guide.</div>
-      <details class="script">
-        <summary>Show suggested dialogue script</summary>
-        <div class="script-text">${clip.script}</div>
-      </details>
-      ${clip.questions.map((q, qi) => questionBlock(findGlobalId('listening', ci, qi), q)).join('')}
-    </div>`;
-  });
-
-  html += sectionHeader('reading', 'Part 2 · Reading', '40 questions');
-  readingPassages.forEach((p, pi) => {
-    html += `<div class="group">
-      <div class="group-label">PASSAGE ${pi+1} OF 8</div>
-      <div class="passage-title">${p.title}</div>
-      <div class="passage-text">${p.text}</div>
-      ${p.questions.map((q, qi) => questionBlock(findGlobalId('reading', pi, qi), q)).join('')}
-    </div>`;
-  });
-
-  html += sectionHeader('grammar', 'Part 3 · Grammar', '40 questions');
-  html += `<div class="group">`;
-  grammarQuestions.forEach((q, qi) => {
-    html += questionBlock(findGlobalId('grammar', null, qi), q);
-  });
-  html += `</div>`;
-
-  container.innerHTML = html;
-  buildScantron();
-  attachOptionListeners();
-}
-
-function sectionHeader(cls, title, sub){
-  return `<div class="section-header ${cls}"><span class="swatch"></span><h2>${title}</h2><span class="sub">${sub}</span></div>`;
-}
-
-function findGlobalId(section, groupIndex, qIndexInGroup){
-  return matchId(section, groupIndex, qIndexInGroup);
-}
-
-function matchId(section, groupIndex, qIndexInGroup){
-  let counter = -1;
-  for (const q of allQuestions){
-    if (q.section !== section) continue;
-    if (section === 'listening' && q.clipIndex !== groupIndex) continue;
-    if (section === 'reading' && q.passageIndex !== groupIndex) continue;
-    counter++;
-    if (counter === qIndexInGroup) return q.id;
-  }
-  return null;
-}
-
-function questionBlock(globalId, q){
-  const letters = ['A','B','C','D'];
-  return `<div class="question">
-    <div class="qnum">QUESTION ${globalId}</div>
-    <div class="qtext">${q.text}</div>
-    <div class="options">
-      ${q.options.map((opt, oi) => `
-        <div class="option">
-          <input type="radio" name="q${globalId}" id="q${globalId}o${oi}" value="${oi}">
-          <label for="q${globalId}o${oi}">${letters[oi]}. ${opt}</label>
-        </div>`).join('')}
-    </div>
-  </div>`;
-}
-
-function attachOptionListeners(){
-  document.querySelectorAll('.options input[type=radio]').forEach(input => {
-    input.addEventListener('change', (e) => {
-      const name = e.target.name; // e.g. q23
-      const id = parseInt(name.replace('q',''));
-      userAnswers[id] = parseInt(e.target.value);
-      updateScantron();
-    });
-  });
-}
-
-// Timer Which is programmed by ChatGPT //
-
-const timerElement = document.getElementById("timerValue");
-const beginBtn = document.getElementById("beginBtn");
-
-let totalSeconds = 1 * 10 * 60; // ساعتان
-let timerInterval;
-
-// Convert seconds to HH:MM:SS
-function updateTimer() {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    timerElement.textContent =
-        `${String(hours).padStart(2, "0")}:` +
-        `${String(minutes).padStart(2, "0")}:` +
-        `${String(seconds).padStart(2, "0")}`;
-
-    // Turn red when 10 minutes remain
-    if (totalSeconds <= 600) {
-        timerElement.classList.add("warning");
-    }
-
-    // Time is over
-    if (totalSeconds <= 0) {
-        clearInterval(timerInterval);
-        alert("انتهى الوقت");
+    <a
+        href="https://yazeedenglish.com/step"
+        class="course-file-btn"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        دورة ستيب
         
-        timeExpired = true;
+    </a>
 
-        document.getElementById("submitBtn").click();
+</div>
+
+</header>
 
 
-        return;
-    }
+    <main class="main-website">
 
-    totalSeconds--;
-}
+        <!-- =================================================
+             INTRO PAGE
+        ================================================== -->
 
-// Start timer when button is clicked
-beginBtn.addEventListener("click", () => {
+        <section id="introPage">
 
-    // Prevent starting multiple timers
-    if (timerInterval) return;
+            <div class="page-header">
 
-    updateTimer(); // Display immediately
-    timerInterval = setInterval(updateTimer, 1000);
+                <div class="page-label">
+                    STEP EXAM SIMULATOR
+                </div>
 
-});
+                <h1>
+                    اختبار STEP المحاكي
+                </h1>
 
-/* ---------- Scantron progress ---------- */
-function buildScantron(){
-  const el = document.getElementById('scantron');
-  const rows = [
-    {section:'listening', count:20},
-    {section:'reading', count:40},
-    {section:'grammar', count:40}
-  ];
-  el.innerHTML = rows.map(r => {
-    let bubbles = '';
-    for (let i=0;i<r.count;i++){
-      bubbles += `<div class="bubble" data-section="${r.section}" data-idx="${i}"></div>`;
-    }
-    return `<div class="scantron-row">${bubbles}</div>`;
-  }).join('');
-}
+                <p>
+                    اختبر مستواك في ستيب بطريقة فعلية
+           
+                </p>
 
-function updateScantron(){
-  const bySection = {listening:[], reading:[], grammar:[]};
-  allQuestions.forEach(q => bySection[q.section].push(q.id));
+            </div>
 
-  ['listening','reading','grammar'].forEach(section => {
-    const ids = bySection[section];
-    document.querySelectorAll(`.bubble[data-section="${section}"]`).forEach((bubble, idx) => {
-      const qid = ids[idx];
-      const answered = userAnswers[qid] !== undefined;
-      bubble.classList.toggle(`filled-${section}`, answered);
-    });
-  });
 
-  const answeredCount = Object.keys(userAnswers).length;
-  document.getElementById('answeredCount').textContent = `${answeredCount} / 100 answered`;
-}
+            <!-- EXAM SECTIONS -->
 
-/* ============================================================
-   SCORING
-============================================================ */
-function scoreExam(){
-  let scores = {listening:0, reading:0, grammar:0};
-  allQuestions.forEach(q => {
-    if (userAnswers[q.id] === q.answer) scores[q.section]++;
-  });
-  return scores;
-}
+            <div class="exam-overview">
 
-function showResults(){
-  const scores = scoreExam();
-  const total = scores.listening + scores.reading + scores.grammar;
+                <div class="overview-card">
 
-  document.getElementById('scoreValue').textContent = total;
-  document.getElementById('listeningScore').textContent = `${scores.listening}/20`;
-  document.getElementById('readingScore').textContent = `${scores.reading}/40`;
-  document.getElementById('grammarScore').textContent = `${scores.grammar}/40`;
-  document.getElementById('listeningBar').style.width = (scores.listening/20*100)+'%';
-  document.getElementById('readingBar').style.width = (scores.reading/40*100)+'%';
-  document.getElementById('grammarBar').style.width = (scores.grammar/40*100)+'%';
+                    <div class="overview-icon">
+                        🎧
+                    </div>
 
-  let msg = '';
-  if (total >= 85) msg = 'Excellent performance across all sections.';
-  else if (total >= 70) msg = 'Strong result — a bit more practice on your weaker section could push this higher.';
-  else if (total >= 50) msg = 'A solid foundation, with clear room to improve.';
-  else msg = 'Keep practicing — review the sections where you lost the most points.';
-  document.getElementById('scoreMsg').textContent = msg;
+                    <div class="overview-number">
+                        20
+                    </div>
 
-  document.getElementById('examScreen').classList.add('hidden');
-  document.getElementById('topbar').classList.add('hidden');
-  document.getElementById('resultsScreen').classList.remove('hidden');
-  window.scrollTo({top:0, behavior:'instant'});
-}
+                    <h2>
+                        Listening
+                    </h2>
 
-/* ============================================================
-   NAV / EVENTS
-============================================================ */
-document.getElementById('beginBtn').addEventListener('click', () => {
-  document.getElementById('startScreen').classList.add('hidden');
-  document.getElementById('examScreen').classList.remove('hidden');
-  document.getElementById('topbar').classList.remove('hidden');
-  renderExam();
-  updateScantron();
-  window.scrollTo({top:0, behavior:'instant'});
-});
+                    <p>
+20 سؤال قسم الاستماع
+                    </p>
 
-document.getElementById('submitBtn').addEventListener('click', () => {
-  const answeredCount = Object.keys(userAnswers).length;
-  if (answeredCount < 100){
-    const remaining = 100 - answeredCount;
-    if (!timeExpired) {
-    const proceed = confirm(`لا زال لديك ${remaining} اسئلة غير مجابة. الإرسال على أي حال؟`);
-    if (!proceed) return;
-}
-  }
-  showResults();
-});
+                </div>
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-  Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
-  document.getElementById('resultsScreen').classList.add('hidden');
-  document.getElementById('startScreen').classList.remove('hidden');
-  window.scrollTo({top:0, behavior:'instant'});
-});
 
-/* ---------- Theme toggle ---------- */
-const themeToggle = document.getElementById('themeToggle');
+                <div class="overview-card">
 
-function applyTheme(isDark){
-  document.body.classList.toggle('dark', isDark);
-  themeToggle.textContent = isDark ? '☀️' : '🌙';
-  try { localStorage.setItem('step-exam-theme', isDark ? 'dark' : 'light'); } catch(e) {}
-}
+                    <div class="overview-icon">
+                        📖
+                    </div>
 
-themeToggle.addEventListener('click', () => {
-  applyTheme(!document.body.classList.contains('dark'));
-});
+                    <div class="overview-number">
+                        40
+                    </div>
 
-(function initTheme(){
-  let saved = null;
-  try { saved = localStorage.getItem('step-exam-theme'); } catch(e) {}
-  if (saved === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
-    saved = 'dark';
-  }
-  applyTheme(saved === 'dark');
-})();
+                    <h2>
+                        Reading
+                    </h2>
 
-/* ---------- Grouped listening: 5 clips × 4 questions ---------- */
-let currentQuestionIndex = 0;
-const finishedListeningAudio = new Set();
-const startedListeningAudio = new Set();
+                    <p>
+40 سؤال قسم القراءة
+                    </p>
 
-function groupStart(index){
-  const question = allQuestions[index];
-  if (!question || question.section !== 'listening') return index;
-  return allQuestions.findIndex(item => item.section === 'listening' && item.clipIndex === question.clipIndex);
-}
-function sectionName(section){return {listening:'قسم الاستماع',reading:'قسم القراءة',grammar:'قسم القواعد'}[section];}
-function answerMarkup(question){
-  const letters=['A','B','C','D']; const chosen=userAnswers[question.id];
-  return `<div class="listening-question"><div class="qnum">السؤال ${question.id} من ${allQuestions.length}</div><div class="qtext">${question.text}</div><div class="options">${question.options.map((option,index)=>`<div class="option"><input type="radio" name="q${question.id}" id="q${question.id}o${index}" value="${index}" ${chosen===index?'checked':''}><label for="q${question.id}o${index}">${letters[index]}. ${option}</label></div>`).join('')}</div></div>`;
-}
-function renderExam(){
-  document.getElementById('examContent').innerHTML=`<div class="exam-workspace"><div class="question-progress"><div class="progress-meta"><span id="questionCounter"></span><span id="progressPercentage"></span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div><div class="question-panel" id="questionPanel"></div><div class="exam-navigation"><button class="nav-btn primary" id="nextQuestionBtn">التالي</button><button class="nav-btn" id="previousQuestionBtn">السابق</button></div><p class="navigator-note">الأسئلة غير المجابة مميزة باللون البرتقالي — اضغط على أي رقم للانتقال إليه.</p><div class="question-navigator" id="questionNavigator"></div></div>`;
-  document.getElementById('previousQuestionBtn').addEventListener('click',()=>moveQuestion(-1));
-  document.getElementById('nextQuestionBtn').addEventListener('click',()=>moveQuestion(1));
-  goToQuestion(0);
-}
-function moveQuestion(direction){
-  const current=allQuestions[currentQuestionIndex];
-  let next=currentQuestionIndex+direction;
-  if(current.section==='listening') next=currentQuestionIndex+(direction>0?4:-1);
-  if(next<0) return;
-  if(next>=allQuestions.length){document.getElementById('submitBtn').click();return;}
-  goToQuestion(next);
-}
-function goToQuestion(index){
-  currentQuestionIndex=groupStart(Math.max(0,Math.min(index,allQuestions.length-1)));
-  const question=allQuestions[currentQuestionIndex];
-  const panel=document.getElementById('questionPanel');
-  if(question.section==='listening'){
-    const group=listeningGroups[question.clipIndex];
-    const items=allQuestions.filter(item=>item.section==='listening'&&item.clipIndex===question.clipIndex);
-    panel.innerHTML=`<div class="section-tag">قسم الاستماع — المقطع ${question.clipIndex+1} من 5</div><div class="audio-policy">يمكن تشغيل المقطع مرة واحدة. اقرأ الأسئلة الأربعة ثم شغّل التسجيل.</div><audio class="single-listening" data-group="${question.clipIndex}" preload="auto" src="${group.audio}"></audio><div class="audio-controls"><button class="play-audio-btn" type="button">▶ تشغيل المقطع الصوتي</button><label class="volume-control">🔊 مستوى الصوت <input class="volume-slider" type="range" min="0" max="100" value="80" aria-label="مستوى الصوت"><span class="volume-value">80%</span></label></div>${items.map(answerMarkup).join('')}`;
-    const audio=panel.querySelector('audio');
-    const playButton=panel.querySelector('.play-audio-btn');
-    const volumeSlider=panel.querySelector('.volume-slider');
-    const volumeValue=panel.querySelector('.volume-value');
-    audio.volume=Number(volumeSlider.value)/100;
-    volumeSlider.addEventListener('input',()=>{audio.volume=Number(volumeSlider.value)/100;volumeValue.textContent=`${volumeSlider.value}%`;});
-    if(startedListeningAudio.has(question.clipIndex)){playButton.disabled=true;playButton.textContent=finishedListeningAudio.has(question.clipIndex)?'تم الاستماع إلى المقطع':'تم استخدام فرصة الاستماع';}
-    else playButton.addEventListener('click',()=>{startedListeningAudio.add(question.clipIndex);playButton.disabled=true;playButton.textContent='يتم تشغيل المقطع…';audio.play().catch(()=>{startedListeningAudio.delete(question.clipIndex);playButton.disabled=false;playButton.textContent='▶ تشغيل المقطع الصوتي';});},{once:true});
-    audio.addEventListener('ended',()=>{finishedListeningAudio.add(question.clipIndex);playButton.textContent='تم الاستماع إلى المقطع';},{once:true});
-  }else panel.innerHTML=`<div class="section-tag">${sectionName(question.section)}</div>${answerMarkup(question)}`;
-  panel.querySelectorAll('input[type=radio]').forEach(input=>input.addEventListener('change',event=>{userAnswers[Number(event.target.name.replace('q',''))]=Number(event.target.value);updateScantron();}));
-  updateScantron();window.scrollTo({top:0,behavior:'smooth'});
-}
-function buildScantron(){}
-function updateScantron(){
-  const answered=Object.keys(userAnswers).length,total=allQuestions.length,current=allQuestions[currentQuestionIndex];
-  const count=document.getElementById('answeredCount');if(count)count.textContent=`${answered} / ${total} answered`;
-  document.getElementById('questionCounter').textContent=current.section==='listening'?`الأسئلة ${current.id}–${current.id+3} من ${total}`:`السؤال ${current.id} من ${total}`;
-  document.getElementById('progressPercentage').textContent=`${Math.round(answered/total*100)}% مكتمل`;
-  document.getElementById('progressBar').style.width=`${answered/total*100}%`;
-  const nav=document.getElementById('questionNavigator');nav.innerHTML=allQuestions.map((q,index)=>`<button class="question-jump ${userAnswers[q.id]!==undefined?'answered':'unanswered'} ${(q.section==='listening'?q.clipIndex===current.clipIndex:index===currentQuestionIndex)?'current':''}" data-index="${index}">${q.id}</button>`).join('');
-  nav.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>goToQuestion(Number(button.dataset.index))));
-  document.getElementById('previousQuestionBtn').disabled=currentQuestionIndex===0;
-  document.getElementById('nextQuestionBtn').textContent=currentQuestionIndex===allQuestions.length-1?'تسليم الاختبار':'التالي';
-}
+                </div>
 
-/* Clear, celebratory results with five official levels. */
-function showResults(){
-  const scores=scoreExam();
-  const total=scores.listening+scores.reading+scores.grammar;
-  const level=total<=1?'ضعيف':total<=2?'مبتدئ':total<=3?'متوسط':total<=4?'فوق المتوسط':'متقدم';
-  const emoji =
-  level === 'ضعيف' ? '😔' :
-  level === 'مبتدئ' ? '🌱' :
-  level === 'متوسط' ? '📘' :
-  level === 'فوق المتوسط' ? '🚀' :
-  '🏆';
-  const message=total<=1?'تحتاج إلى خطة تدريب واضحة قبل دخول الاختبار الفعلي.':total<=2?'لديك بداية جيدة، والتدريب المنتظم سيرفع مستواك.':total<=3?'نتيجة جيدة؛ ركّز على نقاط الضعف لتتقدم أكثر.':total<=4?'أداء قوي جدًا — لمسات أخيرة قد تنقلك إلى المستوى المتقدم.':'أداء ممتاز! أنت في مستوى جاهزية عالٍ.';
-  const course=level==='متقدم'?'':`<p class="course-hint">طوّر مستواك بخطة تدريب مخصصة لاختبار ستيب.</p><a class="course-link" href="https://yazeedenglish.com" target="_blank" rel="noopener noreferrer">استكشف دورة ستيب التعليمية</a>`;
-  const results=document.getElementById('resultsScreen');
-  results.innerHTML=`<div class="result-hero"><div class="celebration">${emoji}</div><div class="result-badge">${level}</div><div class="eyebrow">نتيجتك في الاختبار</div><div class="score-big"><span>${total}</span><span>/100</span></div><p>${message}</p>${course}</div><div class="breakdown"><div class="tile listening"><div class="num">${scores.listening}/20</div><div class="label">الاستماع</div><div class="bar-track"><div class="bar-fill listening" style="width:${scores.listening/20*100}%"></div></div></div><div class="tile reading"><div class="num">${scores.reading}/40</div><div class="label">القراءة</div><div class="bar-track"><div class="bar-fill reading" style="width:${scores.reading/40*100}%"></div></div></div><div class="tile grammar"><div class="num">${scores.grammar}/40</div><div class="label">القواعد</div><div class="bar-track"><div class="bar-fill grammar" style="width:${scores.grammar/40*100}%"></div></div></div></div><button class="restart" id="restartBtn">إعادة الاختبار</button>`;
-  document.getElementById('restartBtn').addEventListener('click',()=>location.reload());
-  document.getElementById('examScreen').classList.add('hidden');document.getElementById('topbar').classList.add('hidden');results.classList.remove('hidden');if (level === 'متقدم') {
 
-    const duration = 3500;
-    const end = Date.now() + duration;
+                <div class="overview-card">
 
-    (function frame() {
+                    <div class="overview-icon">
+                        ✏️
+                    </div>
 
-        confetti({
-            particleCount: 5,
-            angle: 60,
-            spread: 70,
-            startVelocity: 55,
-            origin: { x: 0, y: 0.8 }
-        });
+                    <div class="overview-number">
+                        40
+                    </div>
 
-        confetti({
-            particleCount: 5,
-            angle: 120,
-            spread: 70,
-            startVelocity: 55,
-            origin: { x: 1, y: 0.8 }
-        });
+                    <h2>
+                        Grammar
+                    </h2>
 
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
-        }
+                    <p>
+40 سؤال قسم القواعد
+                    </p>
 
-    })();
+                </div>
 
-    setTimeout(() => {
-        confetti({
-            particleCount: 180,
-            spread: 140,
-            startVelocity: 45,
-            origin: { y: 0.6 }
-        });
-    }, 700);
+            </div>
 
-}window.scrollTo({top:0,behavior:'smooth'});
-}
 
-function openCustomConfirm(){
-  const unanswered=allQuestions.length-Object.keys(userAnswers).length;
-  document.getElementById('confirmMessage').textContent=unanswered>0 ? `لا زال لديك ${unanswered} سؤالًا غير مجاب. يمكنك العودة إلى الأسئلة البرتقالية أو تسليم الاختبار الآن.` : 'أكملت جميع الأسئلة. ستظهر نتيجتك فور تأكيد التسليم.';
-  document.getElementById('confirmModal').hidden=false;
-}
-document.getElementById('submitBtn').addEventListener('click',event=>{event.stopImmediatePropagation();openCustomConfirm();},true);
-document.getElementById('cancelConfirmBtn').addEventListener('click',()=>document.getElementById('confirmModal').hidden=true);
-document.getElementById('approveConfirmBtn').addEventListener('click',()=>{document.getElementById('confirmModal').hidden=true;showResults();});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+            <!-- EXAM INFO -->
+
+            <div class="exam-info">
+
+                <div>
+                    <span>
+                        عدد الأسئلة
+                    </span>
+
+                    <strong>
+                        100 سؤال
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        مدة الاختبار
+                    </span>
+
+                    <strong>
+                        ساعتان
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        الدرجة
+                    </span>
+
+                    <strong>
+                        من 100
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <!-- NOTICE -->
+
+            <div class="notice-card">
+
+                <strong>
+                    قبل أن تبدأ
+                </strong>
+
+                <ul>
+
+                    <li>
+                        يبدأ العداد مباشرة بعد الضغط على "ابدأ الاختبار"
+                    </li>
+
+                    <li>
+                        كل مقطع استماع يمكن تشغيله مرة واحدة فقط
+                    </li>
+
+                    <li>
+                        لن تظهر الإجابات الصحيحة أثناء الاختبار
+                    </li>
+
+                    <li>
+                        عند انتهاء الوقت سيتم إنهاء الاختبار تلقائيًا
+                    </li>
+
+                    <li>
+                        يمكنك الانتقال بين الأسئلة ومراجعة إجاباتك
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- START -->
+
+            <button
+                id="startBtn"
+                class="primary-btn large-btn"
+                type="button"
+            >
+
+                ابدأ الاختبار
+
+                <span>
+                    ←
+                </span>
+
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             TEST PAGE
+        ================================================== -->
+
+        <section
+            id="testPage"
+            class="hidden"
+        >
+
+            <div class="test-sticky">
+
+                <div class="test-top">
+
+                    <div>
+
+                        <div class="section-label">
+                            STEP EXAM SIMULATOR
+                        </div>
+
+                        <div
+                            id="sectionTitle"
+                            class="test-section-title"
+                        >
+                            الاستماع
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="timerBox"
+                        class="timer-box"
+                    >
+
+                        <span>
+                            الوقت المتبقي
+                        </span>
+
+                        <strong id="timerValue">
+                            02:00:00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="progress-row">
+
+                    <span id="progressText">
+                        السؤال 1 من 100
+                    </span>
+
+                    <span id="progressPercent">
+                        1%
+                    </span>
+
+                </div>
+
+
+                <div class="progress-track">
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+<div id="questionNavigator" class="question-navigator"></div>
+
+            <div id="testContent"></div>
+
+            <!-- =========================================================
+     FINISH EXAM CONFIRMATION MODAL
+     ========================================================= -->
+
+<div id="finishModal" class="finish-modal hidden">
+
+    <div class="finish-modal-overlay"></div>
+
+    <div class="finish-modal-card">
+
+        <h2>هل أنت متأكد من إنهاء الاختبار؟</h2>
+
+        <p id="finishModalMessage">
+            لديك 0 سؤالًا غير مجاب
+        </p>
+
+        <div class="finish-modal-actions">
+
+            <button
+                type="button"
+                id="cancelFinishBtn"
+                class="finish-modal-cancel"
+            >
+                متابعة الاختبار
+            </button>
+
+            <button
+                type="button"
+                id="confirmFinishBtn"
+                class="finish-modal-confirm"
+            >
+                إنهاء الاختبار
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="test-navigation">
+
+                <button
+                    id="previousBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
+                    السابق
+                </button>
+
+
+                <button
+                    id="nextBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    التالي
+                </button>
+
+
+                <button
+                    id="finishBtn"
+                    class="finish-btn hidden"
+                    type="button"
+                >
+                    إنهاء الاختبار
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RESULT PAGE
+        ================================================== -->
+
+        <section
+            id="resultPage"
+            class="hidden"
+        >
+
+            <div class="page-header result-header">
+
+                <div class="page-label">
+                    YOUR RESULT
+                </div>
+
+                <h1>
+                    نتيجتك
+                </h1>
+
+                <p id="resultMessage"></p>
+
+            </div>
+
+
+            <div
+                id="resultHero"
+                class="result-hero"
+            >
+
+                <div class="score-circle">
+
+                    <span id="finalScore">
+                        0
+                    </span>
+
+                    <small>
+                        / 100
+                    </small>
+
+                </div>
+
+
+                <div class="level-label">
+                    مستواك
+                </div>
+
+                <h2 id="levelName">
+                    ضعيف
+                </h2>
+
+            </div>
+
+
+            <!-- BREAKDOWN -->
+
+            <div class="result-breakdown">
+
+                <div class="result-card">
+
+                    <span>
+                        🎧 الاستماع
+                    </span>
+
+                    <strong id="listeningScore">
+                        0 / 20
+                    </strong>
+
+                </div>
+
+
+                <div class="result-card">
+
+                    <span>
+                        📖 القراءة
+                    </span>
+
+                    <strong id="readingScore">
+                        0 / 40
+                    </strong>
+
+                </div>
+
+
+                <div class="result-card">
+
+                    <span>
+                        ✏️ القواعد
+                    </span>
+
+                    <strong id="grammarScore">
+                        0 / 40
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- COURSE CTA -->
+
+            <div
+                id="courseCta"
+                class="course-cta hidden"
+            >
+
+                <div class="cta-label">
+
+                </div>
+
+                <h2>
+                    دورة ستيب STEP
+                </h2>
+
+                <p>
+                   دورة ستيب من منصة يزيد للانجليزية هي خطوتك نحو درجة أحلامك
+                </p>
+
+                <a
+                    href="https://course.yazeedenglish.com"
+                    target="_blank"
+                    rel="noopener"
+                    class="primary-btn"
+                >
+                   اكتشف دورة ستيب
+                    <span>↗</span>
+                </a>
+
+            </div>
+
+
+            <div class="result-actions">
+
+                <button
+                    id="restartBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    إعادة الاختبار
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+
+        <div class="footer-line"></div>
+
+        <p>
+Yazeed English - STEP Exam Simulator
+        </p>
+
+    </footer>
+
+
+    <!-- CONFETTI -->
+
+    <canvas
+        id="confettiCanvas"
+        class="confetti-canvas"
+    ></canvas>
+
+
+    <!-- CLAPPING -->
+
+    <audio
+        id="clapAudio"
+        src="audio/celebration.mp3"
+        preload="auto"
+    ></audio>
+
+
+    <script src="script.js"></script>
+
 </body>
+
 </html>
